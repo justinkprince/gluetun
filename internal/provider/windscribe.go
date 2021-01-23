@@ -46,6 +46,7 @@ func (w *windscribe) filterServers(regions, cities, hostnames []string) (servers
 //nolint:lll
 func (w *windscribe) GetOpenVPNConnection(selection models.ServerSelection) (connection models.OpenVPNConnection, err error) {
 	var port uint16
+	fmt.Println("==========> DEBUG: Protocol selected is:", selection.Protocol)
 	switch {
 	case selection.CustomPort > 0:
 		port = selection.CustomPort
@@ -71,7 +72,9 @@ func (w *windscribe) GetOpenVPNConnection(selection models.ServerSelection) (con
 		connections = append(connections, models.OpenVPNConnection{IP: server.IP, Port: port, Protocol: selection.Protocol})
 	}
 
-	return pickRandomConnection(connections, w.randSource), nil
+	randomConn := pickRandomConnection(connections, w.randSource)
+	fmt.Println("==========> DEBUG: connection picked is:", randomConn)
+	return randomConn, nil
 }
 
 func (w *windscribe) BuildConf(connection models.OpenVPNConnection,
@@ -82,6 +85,7 @@ func (w *windscribe) BuildConf(connection models.OpenVPNConnection,
 	if len(settings.Auth) == 0 {
 		settings.Auth = "sha512"
 	}
+	fmt.Println("==========> DEBUG: connection to use in BuildConf is:", connection)
 	lines = []string{
 		"client",
 		"dev tun",
